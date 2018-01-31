@@ -2,7 +2,9 @@
 from __future__ import unicode_literals, division, print_function, absolute_import
 from unittest import TestCase
 
-from vision import OCR
+from vision.image import OCR
+from vision.utils import Time, String
+from vision.path import TempPath, Path
 
 
 class TOCR(OCR):
@@ -13,9 +15,17 @@ class TOCR(OCR):
         raise NotImplementedError()
 
 
-class VisionTest(TestCase):
-    def test_flow(self):
-        image = TOCR("""Horst Rittel and Melvin Webber defined a "wicked" problem as one that could be
+class OCRTest(TestCase):
+    pass
+
+class StringTest(TestCase):
+    def test_flow_oneline(self):
+        s = String("but when we put the feed at the router be in a one or two shows already up there we hope you'll check it out my goal is to get you quite a bit more content than I've been getting you and if common sense just pops up in your feed don't be surprised because you know every now and then we get the band back together man")
+
+        pout.v(s.flow())
+
+    def test_flow_multiline(self):
+        s = String("""Horst Rittel and Melvin Webber defined a "wicked" problem as one that could be
 clearly defined only by solving it, or by solving part of it (1973). This paradox implies,
 essentially, that you have to "solve" the problem once in order to clearly define it and
 then solve it again to create a solution that works. This process
@@ -45,5 +55,47 @@ you a programming assignment, then changed the assignment as soon as you finishe
 the design, and then changed it again just as you were about to turn in the completed pro-
 gram. But that very process is an everyday reality in professional programming.""")
 
-        pout.v(image.flow)
+        pout.v(s.flow())
+
+class TimeTest(TestCase):
+    def test_syntax(self):
+        t = Time("140")
+        self.assertEqual("0:02:20", str(t))
+        self.assertEqual(140, t.total_seconds)
+        #pout.v(t, t.total_seconds)
+        #return
+
+        t = Time("-15m20s")
+        self.assertEqual("-0:15:20", str(t))
+        self.assertEqual(-920, t.total_seconds)
+
+        t = Time("-15m")
+        self.assertEqual("-0:15:00", str(t))
+        self.assertEqual(-900, t.total_seconds)
+
+        t = Time("-15:20")
+        self.assertEqual("-0:15:20", str(t))
+        self.assertEqual(-920, t.total_seconds)
+
+    def test_literal(self):
+        t = Time(204.442388058)
+        self.assertEqual("0:03:24", str(t))
+        self.assertEqual(204, t.total_seconds)
+
+    def test_empty(self):
+        t = Time('')
+        self.assertEqual(0, t.total_seconds)
+
+class PathTest(TestCase):
+    def test_name(self):
+        p = Path("~/some-random-317-name (last 10 minutes).mp3")
+        self.assertEqual("some-random-317-name (last 10 minutes)", p.name)
+
+    def test_safename(self):
+        p = Path("~/some-random-317-name (last 10 minutes).mp3")
+        self.assertEqual("some-random-317-name_last_10_minutes.mp3", p.safename)
+
+    def test_temp(self):
+        p = TempPath("foo", "txt")
+        pout.v(p)
 
