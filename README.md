@@ -1,8 +1,7 @@
 # Transcribe
 
-_verb_ - To convert a representation of language to another representation.
-
-Transcribe is a command line application to extract the text from images and audio files, written in Python.
+1. _verb_ - To convert a representation of language to another representation.
+2. _noun_ - Command line application to extract plain text from images and audio files, written in Python.
 
 ## OCR
 
