@@ -5,7 +5,7 @@ import logging
 import time
 import datetime
 
-import pydub
+import pydub # https://github.com/jiaaro/pydub
 from google.cloud import storage
 from google.cloud.exceptions import NotFound
 from google.cloud import speech
@@ -27,6 +27,14 @@ class SpeechPath(Path):
 
 
 class Speech(object):
+    """Wrapper around Google's speech api
+
+    https://cloud.google.com/speech
+    https://cloud.google.com/speech/docs/reference/libraries#client-libraries-usage-python
+    https://github.com/GoogleCloudPlatform/google-cloud-python/blob/master/speech/
+    https://cloud.google.com/speech/support
+    https://cloud.google.com/speech/docs/best-practices
+    """
 
     TIMEOUT = 10800
 
@@ -48,6 +56,7 @@ class Speech(object):
 
     def _convert(self, path, start, stop):
         audio_format = "ogg"
+        # https://github.com/jiaaro/pydub/blob/master/pydub/audio_segment.py
         audio = pydub.AudioSegment.from_file(path)
         if bool(start) or bool(stop):
             start = Time(start)
@@ -76,6 +85,7 @@ class Speech(object):
 
         logger.info("Converting {} to {} at {}".format(path, audio_format, tp))
 
+        # https://cloud.google.com/speech/docs/basics#audio-encodings
         # https://superuser.com/questions/516806/how-to-encode-audio-with-opus-codec
         #audio.export(tp, format=audio_format, codec="opus", parameters=["-strict", "-2"])
         ogg_audio = pydub.AudioSegment.from_file(
@@ -85,6 +95,10 @@ class Speech(object):
         return tp, ogg_audio
 
     def _upload(self, path):
+        # https://cloud.google.com/python/getting-started/using-cloud-storage
+        # https://github.com/GoogleCloudPlatform/google-cloud-python/
+        # https://cloud.google.com/storage/docs/object-basics
+        # https://googlecloudplatform.github.io/google-cloud-python/latest/storage/client.html
         storage_client = storage.Client()
         bucket_name = storage_client.project
         logger.info("Uploading {} to Google cloud storage bucket {}".format(path, bucket_name))
@@ -99,6 +113,9 @@ class Speech(object):
         blob = bucket.blob(filename)
         blob.upload_from_string(path.contents(), path.mimetype)
         #public_url = blob.public_url
+        # super convenient google doesn't bother with a .uri property for a
+        # thing that seems to be pretty commonly needed
+        # https://stackoverflow.com/a/25373496/5006
         uri = "gs://{}/{}".format(bucket_name, blob.name)
         logger.info("Google cloud storage uri {}".format(uri))
         return uri, blob
@@ -106,7 +123,10 @@ class Speech(object):
     def _transcribe(self, uri, audio):
         client = speech.SpeechClient()
 
+        # NOTE -- according to https://cloud.google.com/speech/quotas  we are
+        # limited to ~180 Minutes
         recog = types.RecognitionAudio(uri=uri)
+        # https://cloud.google.com/speech/reference/rest/v1/RecognitionConfig
         config = types.RecognitionConfig(
             encoding=enums.RecognitionConfig.AudioEncoding.OGG_OPUS,
             sample_rate_hertz=audio.frame_rate,
@@ -114,6 +134,8 @@ class Speech(object):
             enable_word_time_offsets=True
         )
 
+        # https://cloud.google.com/speech/docs/async-recognize
+        # https://googlecloudplatform.github.io/google-cloud-python/latest/speech/index.html#asynchronous-recognition
         operation = client.long_running_recognize(config, recog)
 
         start = time.time()
