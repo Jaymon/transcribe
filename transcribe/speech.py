@@ -128,7 +128,8 @@ class Speech(object):
         path, audio = self._convert(path, start, stop)
         uri, blob = self._upload(path)
         self.response = self._transcribe(uri, audio)
-        # TODO -- delete the blob
+        logger.info("Deleting file from Google cloud storage {}".format(uri))
+        blob.delete() # https://cloud.google.com/storage/docs/object-basics
         return self.response
 
     def __iter__(self):

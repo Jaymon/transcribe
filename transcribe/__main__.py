@@ -38,12 +38,12 @@ def main_ocr(paths, noflow, words):
     for path in paths:
         f = OCR(path)
         f.scan()
-        if noflow:
-            echo.out(f.unformatted)
-
-        elif words:
+        if words:
             for word in f.words:
                 echo.out(word)
+
+        elif noflow:
+            echo.out(f.unformatted)
 
         else:
             echo.out(f.text)
