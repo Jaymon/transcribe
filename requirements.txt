@@ -1,0 +1,6 @@
+captain
+pydub
+google-cloud-vision
+google-cloud-storage
+google-cloud-speech
+

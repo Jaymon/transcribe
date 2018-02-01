@@ -6,11 +6,11 @@ import sys
 from captain import exit, echo
 from captain.decorators import arg
 
-from vision import __version__
-from vision.path import Paths
-from vision.image import ImagePath, OCR
-from vision.speech import SpeechPath, Speech
-from vision.utils import Time
+from transcribe import __version__
+from transcribe.path import Paths
+from transcribe.image import ImagePath, OCR
+from transcribe.speech import SpeechPath, Speech
+from transcribe.utils import Time
 
 
 logger = logging.getLogger()

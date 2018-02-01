@@ -2,9 +2,9 @@
 from __future__ import unicode_literals, division, print_function, absolute_import
 from unittest import TestCase
 
-from vision.image import OCR
-from vision.utils import Time, String
-from vision.path import TempPath, Path
+from transcribe.image import OCR
+from transcribe.utils import Time, String
+from transcribe.path import TempPath, Path
 
 
 class TOCR(OCR):
