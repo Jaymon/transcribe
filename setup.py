@@ -9,6 +9,8 @@ from codecs import open
 
 name = "transcribe"
 
+kwargs = {"name": name}
+
 def read(path):
     if os.path.isfile(path):
         with open(path, encoding='utf-8') as f:
@@ -17,25 +19,31 @@ def read(path):
 
 
 vpath = os.path.join(name, "__init__.py")
-if not os.path.isfile(vpath): vpath = os.path.join("{}.py".format(name))
-version = re.search("^__version__\s*=\s*[\'\"]([^\'\"]+)", read(vpath), flags=re.I | re.M).group(1)
-
-long_description = read('README.rst')
+if os.path.isfile(vpath):
+    kwargs["packages"] = find_packages(exclude=["tests", "tests.*", "examples"])
+else:
+    vpath = "{}.py".format(name)
+    kwargs["py_modules"] = [name]
+kwargs["version"] = re.search(r"^__version__\s*=\s*[\'\"]([^\'\"]+)", read(vpath), flags=re.I | re.M).group(1)
+kwargs["long_description"] = read('README.rst')
 
 tests_modules = []
-install_modules = list(filter(None, read("requirements.txt").splitlines(False)))
-
+install_modules = [
+    "captain",
+    "pydub",
+    "google-cloud-vision",
+    "google-cloud-storage",
+    "google-cloud-speech",
+]
 
 setup(
-    name=name,
-    version=version,
     description='Convert images or audio files to plain text on the command line',
     long_description=long_description,
+    keywords="ocr transcription speech-to-text speech-recognition command-line-tool",
     author='Jay Marcyes',
     author_email='jay@marcyes.com',
     url='http://github.com/Jaymon/{}'.format(name),
     #py_modules=[name], # files
-    packages=find_packages(), # folders
     license="MIT",
     install_requires=install_modules,
     tests_require=tests_modules,
