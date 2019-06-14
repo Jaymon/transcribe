@@ -59,6 +59,7 @@ setup(
         'console_scripts': [
             '{} = {}.__main__:console'.format(name, name),
         ],
-    }
+    },
+    **kwargs
 )
 
