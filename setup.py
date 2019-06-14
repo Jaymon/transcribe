@@ -38,7 +38,6 @@ install_modules = [
 
 setup(
     description='Convert images or audio files to plain text on the command line',
-    long_description=long_description,
     keywords="ocr transcription speech-to-text speech-recognition command-line-tool",
     author='Jay Marcyes',
     author_email='jay@marcyes.com',
