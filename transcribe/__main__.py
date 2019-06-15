@@ -67,3 +67,6 @@ def main_speech(paths, start, stop, lang):
 def console():
     exit(__name__)
 
+if __name__ == "__main__":
+    console()
+
