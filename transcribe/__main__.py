@@ -3,7 +3,7 @@ from __future__ import unicode_literals, division, print_function, absolute_impo
 import logging
 import sys
 
-from captain import exit as console, echo
+from captain import exit, echo
 from captain.decorators import arg
 
 from transcribe import __version__
@@ -64,5 +64,6 @@ def main_speech(paths, start, stop, lang):
             echo.out("{:<15}{}", time, text)
 
 
-console(__name__)
+def console():
+    console(__name__)
 
