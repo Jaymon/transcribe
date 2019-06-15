@@ -65,5 +65,5 @@ def main_speech(paths, start, stop, lang):
 
 
 def console():
-    console(__name__)
+    exit(__name__)
 
