@@ -64,9 +64,12 @@ def main_speech(paths, start, stop, lang):
             echo.out("{:<15}{}", time, text)
 
 
+# allows for setup.py console scripts
 def console():
     exit(__name__)
 
+
+# allows for "python -m transcribe" syntax
 if __name__ == "__main__":
     console()
 
