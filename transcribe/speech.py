@@ -63,19 +63,19 @@ class Speech(object):
             stop = Time(stop)
             if start and not stop:
                 logger.info("Starting audio at {}".format(start))
-                audio = audio[start.total_ms:]
+                audio = audio[start.total_ms():]
             elif stop and not start:
                 logger.info("Stopping audio at {}".format(stop))
-                audio = audio[:stop.total_ms:]
+                audio = audio[:stop.total_ms():]
             else:
                 logger.info("Slicing audio {} - {}".format(start, stop))
-                audio = audio[start.total_ms:stop.total_ms]
+                audio = audio[start.total_ms():stop.total_ms()]
 
             tp = TempPath(
                 "{}-{}-{}".format(
                     path.name,
-                    start.total_seconds,
-                    stop.total_seconds
+                    start.total_seconds(),
+                    stop.total_seconds()
                 ),
                 audio_format
             )

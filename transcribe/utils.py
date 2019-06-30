@@ -82,84 +82,9 @@ class Time(timedelta):
             ret *= -1
         return ret
 
-    def __format__(self, formatstr):
-        return "{{:{}}}".format(formatstr).format(self.__str__())
-
-
-class TimeBAK(object):
-    """Prints time in the format of HH:MM:SS, it will also parse values and normalize
-    their values"""
-    @property
-    def total_seconds(self):
-        ret = self.hours * 3600
-        ret += self.minutes * 60
-        ret += self.seconds
-        return -ret if self.negative else ret
-
-    @property
     def total_ms(self):
-        s = self.total_seconds
+        s = self.total_seconds()
         return s * 1000
-
-    def __init__(self, val):
-        val = str(val)
-
-        self.hours = self.minutes = self.seconds = 0
-        self.negative = False
-
-        if val:
-            if val.startswith("-"):
-                val = val[1:]
-                self.negative = True
-
-            if ":" in val:
-                parts = list(map(int, val.split(":")))
-                parts_count = len(parts)
-                if parts_count == 3:
-                    self.hours, self.minutes, self.seconds = parts
-                elif parts_count == 2:
-                    self.minutes, self.seconds = parts
-                else:
-                    raise ValueError("Invalid time {}, try H:MM:SS or NmNs or N".format(val))
-
-            else:
-                ms = re.findall(r"(\d+)([hms])", val, re.I)
-                if ms:
-                    for n, d in ms:
-                        d = d.lower()
-                        if d == 'h':
-                            self.hours = int(n)
-                        elif d == 'm':
-                            self.minutes = int(n)
-                        elif d == 's':
-                            self.seconds = int(n)
-
-                else:
-                    # https://stackoverflow.com/a/775075/5006
-                    if "." in val:
-                        val = float(val)
-                    m, s = divmod(int(val), 60)
-                    h, m = divmod(m, 60)
-                    self.hours = h
-                    self.minutes = m
-                    self.seconds = s
-
-    def __str__(self):
-        s = str(datetime.timedelta(seconds=abs(self.total_seconds)))
-        #s = time.strftime('%H:%M:%S', time.gmtime(self.total_seconds))
-        if self.negative:
-            s = "-{}".format(s)
-        return s
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __unicode__(self):
-        return self.__str__()
-
-    def __bool__(self):
-        return self.hours > 0 or self.minutes > 0 or self.seconds > 0
-    __nonzero__ = __bool__
 
     def __format__(self, formatstr):
         return "{{:{}}}".format(formatstr).format(self.__str__())

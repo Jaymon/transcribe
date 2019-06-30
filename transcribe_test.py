@@ -62,8 +62,6 @@ class TimeTest(TestCase):
         t = Time("140")
         self.assertEqual("0:02:20", str(t))
         self.assertEqual(140, t.total_seconds())
-        #pout.v(t, t.total_seconds)
-        #return
 
         t = Time("-15m20s")
         self.assertEqual("-0:15:20", str(t))
