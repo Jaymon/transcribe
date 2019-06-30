@@ -61,30 +61,43 @@ class TimeTest(TestCase):
     def test_syntax(self):
         t = Time("140")
         self.assertEqual("0:02:20", str(t))
-        self.assertEqual(140, t.total_seconds)
+        self.assertEqual(140, t.total_seconds())
         #pout.v(t, t.total_seconds)
         #return
 
         t = Time("-15m20s")
         self.assertEqual("-0:15:20", str(t))
-        self.assertEqual(-920, t.total_seconds)
+        self.assertEqual(-920, t.total_seconds())
 
         t = Time("-15m")
         self.assertEqual("-0:15:00", str(t))
-        self.assertEqual(-900, t.total_seconds)
+        self.assertEqual(-900, t.total_seconds())
 
         t = Time("-15:20")
         self.assertEqual("-0:15:20", str(t))
-        self.assertEqual(-920, t.total_seconds)
+        self.assertEqual(-920, t.total_seconds())
 
     def test_literal(self):
         t = Time(204.442388058)
         self.assertEqual("0:03:24", str(t))
-        self.assertEqual(204, t.total_seconds)
+        self.assertEqual(204, t.total_seconds())
 
     def test_empty(self):
         t = Time('')
-        self.assertEqual(0, t.total_seconds)
+        self.assertEqual(0, t.total_seconds())
+
+    def test_hhmmss(self):
+        t = Time("00:01:00")
+        self.assertEqual(1, t.minutes)
+        self.assertEqual(0, t.hours)
+        self.assertEqual(60, t.seconds)
+        self.assertEqual(60, t.total_seconds())
+
+    def test_format(self):
+        t = Time(60)
+        s = "{:<15}".format(t)
+        self.assertEqual("0:01:00        ", s)
+
 
 class PathTest(TestCase):
     def test_name(self):

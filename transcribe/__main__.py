@@ -61,6 +61,7 @@ def main_speech(paths, start, stop, lang):
         f.scan(start, stop)
 
         for time, text in f:
+            pout.v(time)
             echo.out("{:<15}{}", time, text)
 
 

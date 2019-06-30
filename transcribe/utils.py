@@ -2,9 +2,91 @@
 from __future__ import unicode_literals, division, print_function, absolute_import
 import datetime
 import re
+from datetime import timedelta
 
 
-class Time(object):
+class Time(timedelta):
+    """Prints time in the format of HH:MM:SS, it will also parse values and normalize
+    their values"""
+    @property
+    def minutes(self):
+        return self.seconds // 60
+
+    @property
+    def hours(self):
+        return self.seconds // 3600
+
+    def __new__(cls, val):
+    #def __init__(self, val):
+        val = str(val)
+
+        hours = minutes = seconds = 0
+        negative = False
+
+        if val:
+            if val.startswith("-"):
+                val = val[1:]
+                negative = True
+
+            if ":" in val:
+                parts = list(map(int, val.split(":")))
+                parts_count = len(parts)
+                if parts_count == 3:
+                    hours, minutes, seconds = parts
+                elif parts_count == 2:
+                    minutes, seconds = parts
+                else:
+                    raise ValueError("Invalid time {}, try H:MM:SS or NmNs or N".format(val))
+
+            else:
+                ms = re.findall(r"(\d+)([hms])", val, re.I)
+                if ms:
+                    for n, d in ms:
+                        d = d.lower()
+                        if d == 'h':
+                            hours = int(n)
+                        elif d == 'm':
+                            minutes = int(n)
+                        elif d == 's':
+                            seconds = int(n)
+
+                else:
+                    # https://stackoverflow.com/a/775075/5006
+                    if "." in val:
+                        val = float(val)
+                    m, s = divmod(int(val), 60)
+                    h, m = divmod(m, 60)
+                    hours = h
+                    minutes = m
+                    seconds = s
+
+        instance = super(Time, cls).__new__(
+            cls,
+            hours=hours,
+            minutes=minutes,
+            seconds=seconds,
+        )
+
+        instance.negative = negative
+        return instance
+
+    def __str__(self):
+        s = super(Time, self).__str__()
+        if self.negative:
+            s = "-{}".format(s)
+        return s
+
+    def total_seconds(self):
+        ret = super(Time, self).total_seconds()
+        if self.negative:
+            ret *= -1
+        return ret
+
+    def __format__(self, formatstr):
+        return "{{:{}}}".format(formatstr).format(self.__str__())
+
+
+class TimeBAK(object):
     """Prints time in the format of HH:MM:SS, it will also parse values and normalize
     their values"""
     @property
@@ -31,7 +113,7 @@ class Time(object):
                 self.negative = True
 
             if ":" in val:
-                parts = map(int, val.split(":"))
+                parts = list(map(int, val.split(":")))
                 parts_count = len(parts)
                 if parts_count == 3:
                     self.hours, self.minutes, self.seconds = parts
@@ -69,10 +151,18 @@ class Time(object):
             s = "-{}".format(s)
         return s
 
+    def __repr__(self):
+        return self.__str__()
+
+    def __unicode__(self):
+        return self.__str__()
 
     def __bool__(self):
         return self.hours > 0 or self.minutes > 0 or self.seconds > 0
     __nonzero__ = __bool__
+
+    def __format__(self, formatstr):
+        return "{{:{}}}".format(formatstr).format(self.__str__())
 
 
 class String(str):

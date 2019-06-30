@@ -65,7 +65,7 @@ class Speech(object):
                 logger.info("Starting audio at {}".format(start))
                 audio = audio[start.total_ms:]
             elif stop and not start:
-                logger.info("Stoping audio at {}".format(stop))
+                logger.info("Stopping audio at {}".format(stop))
                 audio = audio[:stop.total_ms:]
             else:
                 logger.info("Slicing audio {} - {}".format(start, stop))
