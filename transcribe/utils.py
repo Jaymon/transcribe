@@ -4,6 +4,8 @@ import datetime
 import re
 from datetime import timedelta
 
+from .compat import *
+
 
 class Time(timedelta):
     """Prints time in the format of HH:MM:SS, it will also parse values and normalize
@@ -90,10 +92,85 @@ class Time(timedelta):
         return "{{:{}}}".format(formatstr).format(self.__str__())
 
 
-class String(str):
+class ByteString(Bytes):
+    """Wrapper around a byte string b"" to make sure we have a byte string that
+    will work across python versions and handle the most annoying encoding issues
+    automatically
+
+    :Example:
+        # python 3
+        s = ByteString("foo)
+        str(s) # calls __str__ and returns self.unicode()
+        unicode(s) # errors out
+        bytes(s) # calls __bytes__ and returns ByteString
+        # python 2
+        s = ByteString("foo)
+        str(s) # calls __str__ and returns ByteString
+        unicode(s) # calls __unicode__ and returns String
+        bytes(s) # calls __str__ and returns ByteString
+    """
+    def __new__(cls, val=b"", encoding="UTF-8"):
+        if isinstance(val, type(None)): return None
+
+        if not isinstance(val, (bytes, bytearray)):
+            if is_py2:
+                val = unicode(val)
+            else:
+                val = str(val)
+            #val = val.__str__()
+            val = bytearray(val, encoding)
+
+        instance = super(ByteString, cls).__new__(cls, val)
+        instance.encoding = encoding
+        return instance
+
+    def __str__(self):
+        return self if is_py2 else self.unicode()
+
+    def unicode(self):
+        s = self.decode(self.encoding)
+        return String(s)
+    __unicode__ = unicode
+
+    def bytes(self):
+        return self
+    __bytes__ = bytes
+
+    def raw(self):
+        """because sometimes you need a vanilla bytes()"""
+        return b"" + self
+
+
+class String(Str):
     @property
     def lines(self):
         return self.splitlines(False)
+
+    def __new__(cls, val="", encoding="UTF-8"):
+        if isinstance(val, type(None)): return None
+
+        if not isinstance(val, Str):
+            val = ByteString(val, encoding).unicode()
+
+        instance = super(String, cls).__new__(cls, val)
+        instance.encoding = encoding
+        return instance
+
+    def __str__(self):
+        return self.bytes() if is_py2 else self
+
+    def unicode(self):
+        return self
+    __unicode__ = unicode
+
+    def bytes(self):
+        s = self.encode(self.encoding)
+        return ByteString(s)
+    __bytes__ = bytes
+
+    def raw(self):
+        """because sometimes you need a vanilla str() (or unicode() in py2)"""
+        return "" + self
 
     def flow(self):
         """This attempts to get rid of extraneous newlines

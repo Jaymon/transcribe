@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, print_function, absolute_import
-from unittest import TestCase
+
+import testdata
+from testdata import TestCase
 
 from transcribe.image import OCR
-from transcribe.utils import Time, String
+from transcribe.utils import Time, String, ByteString
 from transcribe.path import TempPath, Path
 
 
@@ -56,6 +58,13 @@ the design, and then changed it again just as you were about to turn in the comp
 gram. But that very process is an everyday reality in professional programming.""")
 
         pout.v(s.flow())
+
+    def test_unicode(self):
+        us = testdata.get_unicode_words()
+        s1 = String(ByteString(us))
+        s2 = String(us)
+        self.assertEqual(s1, s2)
+
 
 class TimeTest(TestCase):
     def test_syntax(self):
